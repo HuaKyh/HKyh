@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>原神角色练度统计 ✿ V7.1 日漫风</title>
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0;font-family:"ZCOOL KuaiLe","Microsoft YaHei","PingFang SC",sans-serif}
+
+body{min-height:100vh;padding:20px;background:linear-gradient(135deg,#ffd6e8 0%,#e8d5f5 35%,#c5e8ff 70%,#d4f5e8 100%);background-attachment:fixed;background-size:cover;transition:background .5s}
+
+body::before{content:"";position:fixed;top:0;left:0;width:100%;height:100%;background-image:radial-gradient(circle at 20% 30%,rgba(255,182,193,.3) 0%,transparent 40%),radial-gradient(circle at 80% 70%,rgba(186,155,220,.25) 0%,transparent 40%),radial-gradient(circle at 50% 50%,rgba(135,206,250,.2) 0%,transparent 50%);pointer-events:none;z-index:0}
+
+h1{text-align:center;color:#e879a8;font-size:28px;margin-bottom:8px;text-shadow:2px 2px 4px rgba(255,255,255,.8),0 0 20px rgba(232,121,168,.3);letter-spacing:2px}
+
+.lang-bar{text-align:center;margin-bottom:16px}
+
+.lang-bar select{padding:6px 14px;border-radius:20px;border:2px solid rgba(232,121,168,.3);background:rgba(255,255,255,.9);color:#d4648e;font-size:14px;cursor:pointer;outline:none}
+
+.card{position:relative;background:rgba(255,255,255,.82);border-radius:20px;padding:18px 20px;margin-bottom:16px;box-shadow:0 8px 32px rgba(232,121,168,.15),0 2px 8px rgba(186,155,220,.1);border:2px solid rgba(255,192,203,.4);backdrop-filter:blur(10px);z-index:1}
+
+.card h3{color:#d4648e;font-size:18px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px dashed rgba(232,121,168,.3);display:flex;align-items:center;gap:8px}
+
+.card h3::before{content:"✿";color:#e879a8}
+
+button{padding:8px 18px;border:none;border-radius:25px;cursor:pointer;margin:3px;color:#fff;font-size:14px;transition:all .2s;background:linear-gradient(135deg,#f4a5c0,#c9a0dc);box-shadow:0 3px 10px rgba(232,121,168,.25)}
+
+button:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(232,121,168,.4)}
+
+button:active{transform:translateY(0)}
+
+button.pink{background:linear-gradient(135deg,#ff9eb5,#ff6b9d)}
+
+button.purple{background:linear-gradient(135deg,#c9a0dc,#9b7ec4)}
+
+button.blue{background:linear-gradient(135deg,#87cefa,#5fb4e8)}
+
+button.green{background:linear-gradient(135deg,#98e8a8,#6bcb7e)}
+
+button.red{background:linear-gradient(135deg,#ff9999,#ff6b6b)}
+
+button.gray{background:linear-gradient(135deg,#c8c8d4,#a0a0b0)}
+
+input,select{padding:8px 12px;border-radius:12px;border:2px solid rgba(232,121,168,.25);margin:3px;background:rgba(255,255,255,.9);color:#5a4a5a;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
+
+input:focus,select:focus{border-color:#e879a8;box-shadow:0 0 0 3px rgba(232,121,168,.15)}
+
+input::placeholder{color:#c4a8b8}
+
+select option{background:#fff;color:#5a4a5a}
+
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:2px}
+
+.mt{margin-top:10px}
+
+.search-select{position:relative;display:inline-block;margin:3px}
+
+.search-select input{width:175px;margin:0}
+
+.search-select .dropdown{display:none;position:absolute;top:100%;left:0;z-index:200;background:rgba(255,255,255,.97);border:2px solid #f4a5c0;border-radius:14px;max-height:300px;overflow-y:auto;width:250px;box-shadow:0 8px 24px rgba(232,121,168,.2)}
+
+.search-select .dropdown.open{display:block}
+
+.search-select .dropdown .dd-item{padding:8px 14px;cursor:pointer;font-size:14px;color:#5a4a5a;border-bottom:1px solid rgba(232,121,168,.1);transition:background .15s}
+
+.search-select .dropdown .dd-item:hover{background:rgba(255,182,193,.25)}
+
+.search-select .dropdown .dd-group{padding:6px 14px;font-size:12px;color:#c97ba0;font-weight:bold;background:linear-gradient(90deg,rgba(255,182,193,.3),rgba(201,160,220,.2));position:sticky;top:0}
+
+.star5{color:#e8a832;font-weight:bold}
+
+.star4{color:#9b7ec4;font-weight:bold}
+
+.star3{color:#5fb4e8;font-weight:bold}
+
+.role-item{margin:10px 0;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(255,230,240,.8),rgba(240,230,255,.8));border:2px solid rgba(232,121,168,.25)}
+
+.role-header{padding:12px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:15px;color:#5a4a5a;user-select:none;background:rgba(255,255,255,.5);transition:background .2s}
+
+.role-header:hover{background:rgba(255,255,255,.8)}
+
+.role-header .arrow{color:#e879a8;font-size:13px}
+
+.role-body{padding:8px 16px 14px;display:none}
+
+.role-body.open{display:block}
+
+.role-meta{font-size:14px;color:#a87890;padding:8px 0}
+
+.role-meta b{color:#d4648e}
+
+.sub-block{margin:10px 0 4px;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.6);border:1px solid rgba(232,121,168,.2)}
+
+.sub-header{padding:10px 14px;cursor:pointer;font-size:14px;font-weight:bold;color:#d4648e;background:rgba(255,255,255,.5);display:flex;justify-content:space-between;align-items:center;user-select:none}
+
+.sub-header:hover{background:rgba(255,255,255,.8)}
+
+.sub-body{padding:10px 14px;display:none;font-size:14px;line-height:2;color:#7a6a7a}
+
+.sub-body.open{display:block}
+
+.sub-body b{color:#d4648e}
+
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}
+
+.role-actions{margin-top:10px;padding-top:8px;border-top:1px dashed rgba(232,121,168,.25)}
+
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(232,121,168,.3);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:999}
+
+.modal-content{padding:24px;border-radius:24px;width:700px;max-width:94vw;max-height:88vh;overflow-y:auto;background:rgba(255,255,255,.95);box-shadow:0 20px 60px rgba(232,121,168,.3);border:3px solid rgba(232,121,168,.3)}
+
+.modal-content h3{color:#d4648e;font-size:20px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px dashed rgba(232,121,168,.3)}
+
+.empty-tip{color:#c4a8b8;text-align:center;padding:30px 0;font-size:15px}
+
+.stat-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+
+.stat-chip{background:linear-gradient(135deg,rgba(255,182,193,.4),rgba(201,160,220,.3));border:1px solid rgba(232,121,168,.3);color:#d4648e;padding:6px 14px;border-radius:20px;font-size:13px}
+
+.bg-settings-btn{position:fixed;top:16px;right:16px;z-index:500;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,rgba(255,182,193,.6),rgba(201,160,220,.6));border:2px solid rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;opacity:.35;transition:all .3s;box-shadow:0 4px 12px rgba(232,121,168,.2)}
+
+.bg-settings-btn:hover{opacity:1;transform:scale(1.1) rotate(15deg)}
+
+.bg-panel{position:fixed;top:70px;right:16px;z-index:500;background:rgba(255,255,255,.95);border-radius:18px;padding:16px;border:2px solid rgba(232,121,168,.3);box-shadow:0 8px 30px rgba(232,121,168,.25);display:none;width:260px}
+
+.bg-panel.open{display:block;animation:slideDown .3s ease}
+
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+
+.bg-panel h4{color:#d4648e;font-size:15px;margin-bottom:10px}
+
+.bg-presets{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+
+.bg-preset{height:36px;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:all .2s}
+
+.bg-preset:hover{transform:scale(1.05);border-color:#e879a8}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="bg-settings-btn" onclick="toggleBgPanel()" title="背景设置">🎨</div>
+
+<div class="bg-panel" id="bgPanel">
+
+  <h4 data-i18n="bg_set">✿ 背景设置</h4>
+
+  <div class="bg-presets">
+
+    <div class="bg-preset" style="background:linear-gradient(135deg,#ffd6e8,#e8d5f5,#c5e8ff)" onclick="setPresetBg(0)" title="粉紫蓝"></div>
+
+    <div class="bg-preset" style="background:linear-gradient(135deg,#ffe4b5,#ffb6c1,#dda0dd)" onclick="setPresetBg(1)" title="暖粉橙"></div>
+
+    <div class="bg-preset" style="background:linear-gradient(135deg,#b0e0e6,#e6e6fa,#ffc0cb)" onclick="setPresetBg(2)" title="清透蓝紫"></div>
+
+    <div class="bg-preset" style="background:linear-gradient(135deg,#98fb98,#90ee90,#00ced1)" onclick="setPresetBg(3)" title="清新绿"></div>
+
+    <div class="bg-preset" style="background:linear-gradient(135deg,#2c2c54,#40407a,#706fd3)" onclick="setPresetBg(4)" title="暗夜紫"></div>
+
+    <div class="bg-preset" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)" onclick="setPresetBg(5)" title="深邃蓝"></div>
+
+  </div>
+
+  <button class="pink" style="width:100%;margin:4px 0" onclick="document.getElementById('bgFileInput2').click()" data-i18n="upload_bg">📁 上传本地图片</button>
+
+  <button class="gray" style="width:100%;margin:4px 0" onclick="resetBg()" data-i18n="reset_bg">🔄 恢复默认</button>
+
+  <input type="file" id="bgFileInput2" accept="image/*" style="display:none">
+
+</div>
+
+<h1 data-i18n="title">✿ 原神角色练度统计 ✿ V7.1</h1>
+
+<div class="lang-bar">
+
+  <select id="langSelect" onchange="setLang(this.value)">
+
+    <option value="zh">简体中文</option>
+
+    <option value="en">English</option>
+
+    <option value="ja">日本語</option>
+
+    <option value="fr">Français</option>
+
+    <option value="es">Español</option>
+
+    <option value="ru">Русский</option>
+
+    <option value="ar">العربية</option>
+
+    <option value="de">Deutsch</option>
+
+    <option value="ko">한국어</option>
+
+    <option value="pt">Português</option>
+
+    <option value="it">Italiano</option>
+
+    <option value="th">ไทย</option>
+
+    <option value="vi">Tiếng Việt</option>
+
+  </select>
+
+</div>
+
+<div class="card">
+
+  <h3 data-i18n="acc_mgr">账号管理</h3>
+
+  <div class="row">
+
+    <input id="accName" data-i18n-ph="acc_name_ph">
+
+    <button class="pink" onclick="addAccount()" data-i18n="add_acc">新增账号</button>
+
+    <select id="accSelect" onchange="onAccChange()"></select>
+
+    <button class="red" onclick="delAccount()" data-i18n="del_acc">删除当前账号</button>
+
+  </div>
+
+</div>
+
+<div class="card">
+
+  <h3 data-i18n="quick_add">快速新增角色（从库中搜索选择）</h3>
+
+  <div class="row">
+
+    <div class="search-select"><input id="rName" autocomplete="off" data-i18n-ph="search_role_ph" onfocus="openDD('charDD')" oninput="filterDD('charDD',this.value)"><div class="dropdown" id="charDD"></div></div>
+
+    <select id="rStar"><option value="">星级</option><option value="5">5★</option><option value="4">4★</option></select>
+
+    <select id="rEle"><option value="">元素</option><option value="火">火</option><option value="水">水</option><option value="冰">冰</option><option value="雷">雷</option><option value="风">风</option><option value="岩">岩</option><option value="草">草</option></select>
+
+    <input id="rCon" placeholder="命座" type="number" min="0" max="6" style="width:75px">
+
+    <input id="rLv" placeholder="角色等级" type="number" min="1" max="90" style="width:95px">
+
+  </div>
+
+  <div class="row mt">
+
+    <select id="wType" onchange="updateWeaponDD()"><option value="">武器类型</option><option value="单手剑">单手剑</option><option value="双手剑">双手剑</option><option value="长柄武器">长柄武器</option><option value="法器">法器</option><option value="弓">弓</option></select>
+
+    <div class="search-select"><input id="wName" autocomplete="off" data-i18n-ph="search_weapon_ph" onfocus="openDD('weaponDD')" oninput="filterDD('weaponDD',this.value)"><div class="dropdown" id="weaponDD"></div></div>
+
+    <input id="wLv" placeholder="武器等级" type="number" min="1" max="90" style="width:95px">
+
+    <input id="wRef" placeholder="精炼" type="number" min="1" max="5" style="width:75px">
+
+    <input id="wNote" placeholder="备注（可选）" style="width:130px">
+
+  </div>
+
+  <div class="row mt">
+
+    <input id="t1" placeholder="普攻天赋" type="number" min="1" max="10" style="width:95px">
+
+    <input id="t2" placeholder="E天赋" type="number" min="1" max="10" style="width:85px">
+
+    <input id="t3" placeholder="Q天赋" type="number" min="1" max="10" style="width:85px">
+
+    <div class="search-select"><input id="artSet" autocomplete="off" data-i18n-ph="search_art_ph" onfocus="openDD('artDD')" oninput="filterDD('artDD',this.value)"><div class="dropdown" id="artDD"></div></div>
+
+  </div>
+
+  <div class="row mt">
+
+    <input id="sAtk" placeholder="攻击力" style="width:105px">
+
+    <input id="sDef" placeholder="防御力" style="width:105px">
+
+    <input id="sEm" placeholder="元素精通" style="width:105px">
+
+    <input id="sCr" placeholder="暴击率%" style="width:105px">
+
+    <input id="sCd" placeholder="暴击伤害%" style="width:105px">
+
+  </div>
+
+  <div class="row mt">
+
+    <input id="sEr" placeholder="元素充能效率%" style="width:125px">
+
+    <input id="sDmg" placeholder="元素伤害加成%" style="width:125px">
+
+    <input id="sHp" placeholder="生命值" style="width:105px">
+
+  </div>
+
+  <div class="mt"><button class="green" onclick="saveRole()" data-i18n="save_role">保存角色 ✿</button></div>
+
+</div>
+
+<div class="card">
+
+  <h3 data-i18n="csv_title">CSV 导入导出</h3>
+
+  <div class="row">
+
+    <input type="file" id="fileInput" accept=".csv" style="display:none">
+
+    <button class="blue" onclick="document.getElementById('fileInput').click()" data-i18n="import_csv">导入CSV</button>
+
+    <button class="blue" onclick="exportCsv()" data-i18n="export_csv">导出全部账号CSV</button>
+
+  </div>
+
+  <div class="row mt">
+
+    <input id="enkaUid" placeholder="输入原神UID（9位数字）" style="width:200px">
+
+    <button id="enkaBtn" class="purple" onclick="fetchEnka()">从Enka拉取角色 ✿</button>
+
+    <span style="font-size:12px;color:#a87890;margin-left:8px">需联网，角色需放入游戏展示柜</span>
+
+  </div>
+
+</div>
+
+<div class="card">
+
+  <h3><span data-i18n="role_list">角色列表（点击展开 → 武器 + 圣遗物子栏）</span>
+
+    <button class="purple" style="float:right;font-size:13px;padding:6px 14px" onclick="toggleAllRole()" data-i18n="expand_all">全部展开/收起</button>
+
+  </h3>
+
+  <div class="stat-bar" id="statBar"></div>
+
+  <div id="roleListWrap"><div class="empty-tip" data-i18n="no_role">暂无角色，请先在上方录入或导入CSV ✿</div></div>
+
+</div>
+
+<div class="modal" id="editModal">
+
+  <div class="modal-content">
+
+    <h3 data-i18n="edit_role">✿ 编辑角色</h3>
+
+    <div class="row">
+
+      <div class="search-select"><input id="edit_rName" autocomplete="off" data-i18n-ph="search_role_ph" onfocus="openDD('edit_charDD')" oninput="filterDD('edit_charDD',this.value)"><div class="dropdown" id="edit_charDD"></div></div>
+
+      <select id="edit_rStar"><option value="5">5★</option><option value="4">4★</option></select>
+
+      <select id="edit_rEle"><option value="火">火</option><option value="水">水</option><option value="冰">冰</option><option value="雷">雷</option><option value="风">风</option><option value="岩">岩</option><option value="草">草</option></select>
+
+      <input id="edit_rCon" placeholder="命座" type="number" min="0" max="6" style="width:75px"><input id="edit_rLv" placeholder="等级" type="number" min="1" max="90" style="width:85px">
+
+    </div>
+
+    <div class="row mt">
+
+      <select id="edit_wType" onchange="updateEditWeaponDD()"><option value="">武器类型</option><option value="单手剑">单手剑</option><option value="双手剑">双手剑</option><option value="长柄武器">长柄武器</option><option value="法器">法器</option><option value="弓">弓</option></select>
+
+      <div class="search-select"><input id="edit_wName" autocomplete="off" data-i18n-ph="search_weapon_ph" onfocus="openDD('edit_weaponDD')" oninput="filterDD('edit_weaponDD',this.value)"><div class="dropdown" id="edit_weaponDD"></div></div>
+
+      <input id="edit_wLv" placeholder="武器等级" type="number" min="1" max="90" style="width:85px"><input id="edit_wRef" placeholder="精炼" type="number" min="1" max="5" style="width:75px"><input id="edit_wNote" placeholder="备注" style="width:110px">
+
+    </div>
+
+    <div class="row mt">
+
+      <input id="edit_t1" placeholder="普攻" type="number" min="1" max="10" style="width:75px"><input id="edit_t2" placeholder="E" type="number" min="1" max="10" style="width:65px"><input id="edit_t3" placeholder="Q" type="number" min="1" max="10" style="width:65px">
+
+      <div class="search-select"><input id="edit_artSet" autocomplete="off" data-i18n-ph="search_art_ph" onfocus="openDD('edit_artDD')" oninput="filterDD('edit_artDD',this.value)"><div class="dropdown" id="edit_artDD"></div></div>
+
+    </div>
+
+    <div class="row mt">
+
+      <input id="edit_sAtk" placeholder="攻击力" style="width:105px">
+
+      <input id="edit_sDef" placeholder="防御力" style="width:105px">
+
+      <input id="edit_sEm" placeholder="元素精通" style="width:105px">
+
+      <input id="edit_sCr" placeholder="暴击率%" style="width:105px">
+
+      <input id="edit_sCd" placeholder="暴击伤害%" style="width:105px">
+
+    </div>
+
+    <div class="row mt">
+
+      <input id="edit_sEr" placeholder="元素充能效率%" style="width:125px">
+
+      <input id="edit_sDmg" placeholder="元素伤害加成%" style="width:125px">
+
+      <input id="edit_sHp" placeholder="生命值" style="width:105px">
+
+    </div>
+
+    <div class="mt"><button class="green" onclick="submitEdit()" data-i18n="confirm_edit">确认修改 ✿</button><button class="gray" onclick="closeModal()" data-i18n="cancel">取消</button></div>
+
+  </div>
+
+</div>
+
+<script>
+
+const LANGS={
+
+zh:{title:"✿ 原神角色练度统计 ✿ V7.1",acc_mgr:"账号管理",acc_name_ph:"账号名称，例：大号",add_acc:"新增账号",del_acc:"删除当前账号",no_acc:"暂无账号",quick_add:"快速新增角色（从库中搜索选择）",search_role_ph:"🔍 点击搜索角色",star:"星级",element:"元素",cons_ph:"命座",lv_ph:"角色等级",wtype:"武器类型",search_weapon_ph:"🔍 先选类型再搜武器",wlv_ph:"武器等级",refine_ph:"精炼",note_ph:"备注（可选）",na_ph:"普攻天赋",e_ph:"E天赋",q_ph:"Q天赋",search_art_ph:"🔍 点击搜索圣遗物套装",atk_ph:"攻击力",def_ph:"防御力",em_ph:"元素精通",cr_ph:"暴击率%",cd_ph:"暴击伤害%",er_ph:"元素充能效率%",dmg_ph:"元素伤害加成%",hp_ph:"生命值",save_role:"保存角色 ✿",csv_title:"CSV 导入导出",import_csv:"导入CSV",export_csv:"导出全部账号CSV",role_list:"角色列表（点击展开 → 武器 + 圣遗物子栏）",expand_all:"全部展开/收起",no_role:"暂无角色，请先在上方录入或导入CSV ✿",edit:"编辑",delete:"删除",weapon_info:"⚔️ 武器信息",art_info:"🛡️ 圣遗物套装 & 面板属性",weapon:"武器",type:"类型",level:"等级",refine_short:"精炼",note:"备注",set:"套装",atk:"攻击力",def:"防御力",hp:"生命值",em:"元素精通",cr:"暴击率",cd:"暴击伤害",er:"元素充能",dmg:"元素伤害加成",edit_role:"✿ 编辑角色",confirm_edit:"确认修改 ✿",cancel:"取消",bg_set:"✿ 背景设置",upload_bg:"📁 上传本地图片",reset_bg:"🔄 恢复默认",total:"角色总数",five:"五星",four:"四星",click_expand:"▼ 点击展开",talent:"天赋",g5_char:"★ 五星角色",g4_char:"★ 四星角色",g5_wp:"· 五星",g4_wp:"· 四星",g3_wp:"· 三星",g5_art:"★ 五星圣遗物套装",g4_art:"★ 四星圣遗物套装",sel_wp:"请先选择武器类型",msg_acc_empty:"账号名不能为空",msg_acc_exist:"账号已存在",msg_acc_created:"账号创建成功 ✿",msg_no_acc:"没有可删除的账号",msg_role_empty:"角色名不能为空",msg_role_saved:"角色录入成功 ✿",msg_role_deleted:"角色已删除",msg_edit_saved:"修改已保存 ✿",msg_bg_changed:"背景已切换 ✿",msg_bg_reset:"已恢复默认背景 ✿",msg_bg_updated:"背景已更新 ✿",msg_import_done:"导入完成",msg_csv_exported:"CSV已导出 ✿",msg_please_acc:"请先创建/选择账号",msg_del_acc_confirm:"确定删除账号和里面全部角色？",msg_del_role_confirm:"确定删除角色？"},
+
+en:{title:"✿ Genshin Character Tracker ✿ V7.1",acc_mgr:"Account Management",acc_name_ph:"Account name, e.g. Main",add_acc:"Add Account",del_acc:"Delete Current",no_acc:"No accounts",quick_add:"Quick Add Character (Search from Library)",search_role_ph:"🔍 Click to search character",star:"Star",element:"Element",cons_ph:"Constellation",lv_ph:"Character Lv",wtype:"Weapon Type",search_weapon_ph:"🔍 Select type then search",wlv_ph:"Weapon Lv",refine_ph:"Refine",note_ph:"Note (optional)",na_ph:"Normal Attack",e_ph:"Elemental Skill",q_ph:"Elemental Burst",search_art_ph:"🔍 Click to search artifact set",atk_ph:"ATK",def_ph:"DEF",em_ph:"Elemental Mastery",cr_ph:"Crit Rate%",cd_ph:"Crit DMG%",er_ph:"Energy Recharge%",dmg_ph:"Elemental DMG Bonus%",hp_ph:"HP",save_role:"Save Character ✿",csv_title:"CSV Import / Export",import_csv:"Import CSV",export_csv:"Export All Accounts CSV",role_list:"Character List (Click to expand → Weapon + Artifact)",expand_all:"Expand/Collapse All",no_role:"No characters yet. Add one above or import CSV ✿",edit:"Edit",delete:"Delete",weapon_info:"⚔️ Weapon Info",art_info:"🛡️ Artifact Set & Stats",weapon:"Weapon",type:"Type",level:"Level",refine_short:"Refine",note:"Note",set:"Set",atk:"ATK",def:"DEF",hp:"HP",em:"EM",cr:"Crit Rate",cd:"Crit DMG",er:"Energy Recharge",dmg:"Elem DMG Bonus",edit_role:"✿ Edit Character",confirm_edit:"Confirm ✿",cancel:"Cancel",bg_set:"✿ Background Settings",upload_bg:"📁 Upload Image",reset_bg:"🔄 Reset Default",total:"Total",five:"5★",four:"4★",click_expand:"▼ Expand",talent:"Talents",g5_char:"★ 5-Star Characters",g4_char:"★ 4-Star Characters",g5_wp:"· 5-Star",g4_wp:"· 4-Star",g3_wp:"· 3-Star",g5_art:"★ 5-Star Artifact Sets",g4_art:"★ 4-Star Artifact Sets",sel_wp:"Please select weapon type first",msg_acc_empty:"Account name cannot be empty",msg_acc_exist:"Account already exists",msg_acc_created:"Account created ✿",msg_no_acc:"No account to delete",msg_role_empty:"Character name cannot be empty",msg_role_saved:"Character saved ✿",msg_role_deleted:"Character deleted",msg_edit_saved:"Changes saved ✿",msg_bg_changed:"Background changed ✿",msg_bg_reset:"Default background restored ✿",msg_bg_updated:"Background updated ✿",msg_import_done:"Import complete",msg_csv_exported:"CSV exported ✿",msg_please_acc:"Please create/select an account first",msg_del_acc_confirm:"Delete this account and all its characters?",msg_del_role_confirm:"Delete this character?"}
+
+};
+
+let curLang=localStorage.getItem("gsLang")||"zh";
+
+function t(k){return(LANGS[curLang]&&LANGS[curLang][k])||LANGS.zh[k]||k}
+
+function setLang(l){curLang=l;localStorage.setItem("gsLang",l);document.documentElement.lang=l;applyLang();renderAcc();renderList()}
+
+function applyLang(){document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.getAttribute("data-i18n"))});document.querySelectorAll("[data-i18n-ph]").forEach(el=>{el.placeholder=t(el.getAttribute("data-i18n-ph"))});document.title=t("title");document.getElementById("langSelect").value=curLang}
+
+const E={anemo:"风",pyro:"火",hydro:"水",cryo:"冰",electro:"雷",geo:"岩",dendro:"草"};
+
+const C=[
+
+{n:"琴",s:5,e:"anemo"},{n:"迪卢克",s:5,e:"pyro"},{n:"温迪",s:5,e:"anemo"},{n:"可莉",s:5,e:"pyro"},{n:"莫娜",s:5,e:"hydro"},{n:"七七",s:5,e:"cryo"},{n:"刻晴",s:5,e:"electro"},{n:"钟离",s:5,e:"geo"},{n:"甘雨",s:5,e:"cryo"},{n:"魈",s:5,e:"anemo"},{n:"胡桃",s:5,e:"pyro"},{n:"阿贝多",s:5,e:"geo"},{n:"优菈",s:5,e:"cryo"},{n:"雷电将军",s:5,e:"electro"},{n:"神里绫华",s:5,e:"cryo"},{n:"宵宫",s:5,e:"pyro"},{n:"荒泷一斗",s:5,e:"geo"},{n:"申鹤",s:5,e:"cryo"},{n:"神里绫人",s:5,e:"hydro"},{n:"夜兰",s:5,e:"hydro"},{n:"枫原万叶",s:5,e:"anemo"},{n:"流浪者",s:5,e:"anemo"},{n:"纳西妲",s:5,e:"dendro"},{n:"赛诺",s:5,e:"electro"},{n:"妮露",s:5,e:"hydro"},{n:"提纳里",s:5,e:"dendro"},{n:"艾尔海森",s:5,e:"dendro"},{n:"白术",s:5,e:"dendro"},{n:"迪希雅",s:5,e:"pyro"},{n:"林尼",s:5,e:"pyro"},{n:"那维莱特",s:5,e:"hydro"},{n:"芙宁娜",s:5,e:"hydro"},{n:"莱欧斯利",s:5,e:"cryo"},{n:"娜维娅",s:5,e:"geo"},{n:"克洛琳德",s:5,e:"electro"},{n:"阿蕾奇诺",s:5,e:"pyro"},{n:"希格雯",s:5,e:"hydro"},{n:"恰斯卡",s:5,e:"anemo"},{n:"艾梅莉埃",s:5,e:"dendro"},{n:"玛薇卡",s:5,e:"pyro"},{n:"茜特菈莉",s:5,e:"cryo"},{n:"闲云",s:5,e:"anemo"},{n:"瓦雷莎",s:5,e:"electro"},{n:"希诺宁",s:5,e:"geo"},{n:"基尼奇",s:5,e:"dendro"},{n:"玛拉妮",s:5,e:"hydro"},{n:"桑多涅",s:5,e:"cryo"},{n:"薇斯纳",s:5,e:"anemo"},{n:"沃雅妮莎",s:5,e:"hydro"},{n:"丝柯克",s:5,e:"cryo"},{n:"爱可菲",s:5,e:"cryo"},{n:"奥黛塔",s:5,e:"cryo"},{n:"菲林斯",s:5,e:"electro"},{n:"伊涅芙",s:5,e:"electro"},{n:"尼可",s:5,e:"pyro"},{n:"莉奈娅",s:5,e:"geo"},{n:"法尔伽",s:5,e:"anemo"},{n:"兹白",s:5,e:"geo"},{n:"哥伦比娅",s:5,e:"hydro"},{n:"杜林",s:5,e:"pyro"},{n:"奈芙尔",s:5,e:"dendro"},{n:"菈乌玛",s:5,e:"dendro"},{n:"梦见月瑞希",s:5,e:"anemo"},{n:"达达利亚",s:5,e:"hydro"},{n:"八重神子",s:5,e:"electro"},{n:"珊瑚宫心海",s:5,e:"hydro"},{n:"洛恩",s:5,e:"cryo"},{n:"有乐御簾切",s:5,e:"electro"},
+
+{n:"安柏",s:4,e:"pyro"},{n:"凯亚",s:4,e:"cryo"},{n:"丽莎",s:4,e:"electro"},{n:"雷泽",s:4,e:"electro"},{n:"芭芭拉",s:4,e:"hydro"},{n:"班尼特",s:4,e:"pyro"},{n:"诺艾尔",s:4,e:"geo"},{n:"菲谢尔",s:4,e:"electro"},{n:"砂糖",s:4,e:"anemo"},{n:"香菱",s:4,e:"pyro"},{n:"行秋",s:4,e:"hydro"},{n:"重云",s:4,e:"cryo"},{n:"凝光",s:4,e:"geo"},{n:"北斗",s:4,e:"electro"},{n:"辛焱",s:4,e:"pyro"},{n:"迪奥娜",s:4,e:"cryo"},{n:"罗莎莉亚",s:4,e:"cryo"},{n:"九条裟罗",s:4,e:"electro"},{n:"五郎",s:4,e:"geo"},{n:"托马",s:4,e:"pyro"},{n:"早柚",s:4,e:"anemo"},{n:"鹿野院平藏",s:4,e:"anemo"},{n:"久岐忍",s:4,e:"electro"},{n:"多莉",s:4,e:"electro"},{n:"柯莱",s:4,e:"dendro"},{n:"坎蒂丝",s:4,e:"hydro"},{n:"莱依拉",s:4,e:"cryo"},{n:"珐露珊",s:4,e:"anemo"},{n:"卡维",s:4,e:"dendro"},{n:"琳妮特",s:4,e:"anemo"},{n:"菲米尼",s:4,e:"hydro"},{n:"千织",s:4,e:"geo"},{n:"夏洛蒂",s:4,e:"cryo"},{n:"夏沃蕾",s:4,e:"pyro"},{n:"米卡",s:4,e:"cryo"},{n:"云堇",s:4,e:"geo"},{n:"瑶瑶",s:4,e:"dendro"},{n:"嘉明",s:4,e:"pyro"},{n:"伊安珊",s:4,e:"electro"},{n:"蓝砚",s:4,e:"anemo"},{n:"阿罗夏",s:4,e:"electro"},{n:"爱诺",s:4,e:"hydro"},{n:"烟绯",s:4,e:"pyro"},{n:"绮良良",s:4,e:"dendro"},{n:"赛索斯",s:4,e:"electro"},{n:"卡齐娜",s:4,e:"geo"},{n:"欧洛伦",s:4,e:"electro"},{n:"布伦妮",s:4,e:"anemo"},{n:"叶洛亚",s:4,e:"geo"},{n:"雅珂达",s:4,e:"anemo"}
+
+];
+
+const W={
+
+"单手剑":[
+
+{n:"风鹰剑",s:5},{n:"天空之刃",s:5},{n:"斫峰之刃",s:5},{n:"磐岩结绿",s:5},{n:"波乱月白经津",s:5},{n:"有乐御簾切",s:5},{n:"裁叶萃光",s:5},{n:"静水流涌之辉",s:5},{n:"美露莘的温柔",s:5},{n:"赦罪",s:5},{n:"灰河渡手",s:5},{n:"苍古自由之誓",s:5},{n:"黑蚀",s:5},{n:"朏魄含光",s:5},{n:"雾切之回光",s:5},{n:"圣显之钥",s:5},{n:"苍耀",s:5},{n:"白湖冬羽",s:5},{n:"星锋剑",s:5},{n:"蝶变",s:5},
+
+{n:"暗巷闪光",s:4},{n:"天目影打刀",s:4},{n:"黑剑",s:4},{n:"黑岩长剑",s:4},{n:"辰砂之纺锤",s:4},{n:"笛剑",s:4},{n:"腐殖之剑",s:4},{n:"降临之剑",s:4},{n:"祭礼剑",s:4},{n:"匣里龙吟",s:4},{n:"西风剑",s:4},{n:"铁蜂刺",s:4},{n:"宗室长剑",s:4},{n:"试作斩岩",s:4},{n:"吃虎鱼刀",s:4},{n:"东花坊时雨",s:4},{n:"海渊终曲",s:4},{n:"织月者的曙色",s:4},{n:"引火之源",s:4},{n:"熔猎异端之刃",s:4},{n:"新枝",s:4},{n:"银釭",s:4},{n:"水仙十字之剑",s:4},{n:"笼钓瓶一心",s:4},{n:"西福斯的月光",s:4},{n:"谧音吹哨",s:4},
+
+{n:"暗铁剑",s:3},{n:"飞天御剑",s:3},{n:"黎明神剑",s:3},{n:"旅行剑",s:3},{n:"冷刃",s:3}],
+
+"双手剑":[
+
+{n:"狼的末路",s:5},{n:"天空之傲",s:5},{n:"松籁响起之时",s:5},{n:"无工之剑",s:5},{n:"赤角石溃杵",s:5},{n:"苇海信标",s:5},{n:"山王长牙",s:5},{n:"裁断",s:5},{n:"狼的武功歌",s:5},{n:"焚曜千阳",s:5},{n:"超越之匙",s:5},
+
+{n:"恶王丸",s:4},{n:"黑岩斩刀",s:4},{n:"祭礼大剑",s:4},{n:"桂木斩长正",s:4},{n:"聊聊棒",s:4},{n:"玛海菂的水色",s:4},{n:"森林王器",s:4},{n:"饰铁之花",s:4},{n:"试作古华",s:4},{n:"西风大剑",s:4},{n:"衔珠海皇",s:4},{n:"雨裁",s:4},{n:"白影剑",s:4},{n:"钟剑",s:4},{n:"船坞长剑",s:4},{n:"雪葬的星银",s:4},{n:"浪影阔剑",s:4},{n:"便携动力锯",s:4},{n:"弥坚骨",s:4},{n:"撼地者",s:4},{n:"金律铸影",s:4},{n:"救赎之斩",s:4},{n:"究极霸王超级魔剑",s:4},{n:"掘金之锹",s:4},
+
+{n:"以理服人",s:3},{n:"沐浴龙血的剑",s:3},{n:"佣兵重剑",s:3},{n:"铁影阔剑",s:3},{n:"白铁大剑",s:3}],
+
+"长柄武器":[
+
+{n:"护摩之杖",s:5},{n:"和璞鸢",s:5},{n:"贯虹之槊",s:5},{n:"息灾",s:5},{n:"峡湾长歌",s:5},{n:"薙草之稻光",s:5},{n:"赤沙之杖",s:5},{n:"山武",s:5},{n:"静海潮音",s:5},{n:"圣祭者的辉杖",s:5},{n:"天空之脊",s:5},{n:"赤月之形",s:5},{n:"柔灯挽歌",s:5},{n:"支离轮光",s:5},{n:"灾悔",s:5},{n:"香韵奏者",s:5},
+
+{n:"公义的酬报",s:4},{n:"黑岩刺枪",s:4},{n:"匣里灭辰",s:4},{n:"祭礼枪",s:4},{n:"决斗之枪",s:4},{n:"千岩长枪",s:4},{n:"试作星镰",s:4},{n:"流月针",s:4},{n:"龙脊长枪",s:4},{n:"喜多院十文字",s:4},{n:"断浪长鳍",s:4},{n:"渔获",s:4},{n:"让我为你倒杯热茶",s:4},{n:"西风长枪",s:4},{n:"风信之锋",s:4},{n:"贯月矢",s:4},{n:"镇山之钉",s:4},{n:"勘探钻机",s:4},{n:"戍望谣歌",s:4},{n:"寒息",s:4},{n:"献祭者之杖",s:4},
+
+{n:"白缨枪",s:3},{n:"黑缨枪",s:3},{n:"钺矛",s:3}],
+
+"法器":[
+
+{n:"四风原典",s:5},{n:"天空之卷",s:5},{n:"尘世之锁",s:5},{n:"不灭月华",s:5},{n:"神乐之真意",s:5},{n:"千夜浮梦",s:5},{n:"图莱杜拉的回忆",s:5},{n:"金流监督",s:5},{n:"鹤鸣余音",s:5},{n:"碧落之珑",s:5},{n:"纯水流华",s:5},{n:"冲浪时光",s:5},{n:"真语秘匣",s:5},{n:"祭星者之望",s:5},{n:"尘光七谕",s:5},{n:"星唤之表",s:5},{n:"纺夜天镜",s:5},{n:"漩流颂歌",s:5},
+
+{n:"白辰之环",s:4},{n:"嘟嘟可故事集",s:4},{n:"黑岩绯玉",s:4},{n:"匣里日月",s:4},{n:"祭礼残章",s:4},{n:"流浪乐章",s:4},{n:"魔导绪论",s:4},{n:"忍冬之果",s:4},{n:"试作金珀",s:4},{n:"万国诸海图谱",s:4},{n:"西风秘典",s:4},{n:"盈满之实",s:4},{n:"遗祀玉珑",s:4},{n:"宗室秘法录",s:4},{n:"证誓之明瞳",s:4},{n:"寸心余响",s:4},{n:"凝雪沉心",s:4},{n:"天光的纺琴",s:4},{n:"流浪的晚星",s:4},{n:"群王局戏",s:4},{n:"霜辰",s:4},{n:"乌髓孑灯",s:4},
+
+{n:"甲级宝珏",s:3},{n:"翡玉法球",s:3},{n:"讨龙英杰谭",s:3},{n:"异世界行记",s:3}],
+
+"弓":[
+
+{n:"阿莫斯之弓",s:5},{n:"冬极白星",s:5},{n:"锻月·登龙剑",s:5},{n:"猎人之径",s:5},{n:"若水",s:5},{n:"天空之翼",s:5},{n:"星鹫赤羽",s:5},{n:"最初的大魔术",s:5},{n:"终末嗟叹之诗",s:5},{n:"幽夜华尔兹",s:5},{n:"悬黎千钧",s:5},{n:"柔风游弦",s:5},
+
+{n:"弓藏",s:4},{n:"黑岩战弓",s:4},{n:"祭礼弓",s:4},{n:"竭泽",s:4},{n:"掠食者",s:4},{n:"烈阳之嗣",s:4},{n:"破魔之弓",s:4},{n:"钢轮弓",s:4},{n:"试作澹月",s:4},{n:"王下近侍",s:4},{n:"西风猎弓",s:4},{n:"绝弦",s:4},{n:"宗室长弓",s:4},{n:"苍翠猎弓",s:4},{n:"风花之颂",s:4},{n:"落霞",s:4},{n:"鹮穿之喙",s:4},{n:"无垠蔚蓝之歌",s:4},{n:"沙中伟贤的对答",s:4},{n:"苍纹角杯",s:4},{n:"厄水之祸",s:4},{n:"且住亭御咄",s:4},{n:"冷寂迸音",s:4},{n:"拾慧铸熔",s:4},{n:"乘浪的回旋",s:4},{n:"缀花之翎",s:4},{n:"静谧之曲",s:4},{n:"霜雪誓约",s:4},{n:"虹蛇的雨弦",s:4},{n:"罗网勾针",s:4},
+
+{n:"弹弓",s:3},{n:"反曲弓",s:3},{n:"信使",s:3},{n:"鸦羽弓",s:3},{n:"神射手之誓",s:3}]
+
+};
+
+const A=[
+
+{n:"角斗士的终幕礼",s:5},{n:"流浪大地的乐团",s:5},{n:"冰风迷途的勇士",s:5},{n:"渡过烈火的贤人",s:5},{n:"沉沦之心",s:5},{n:"逆飞的流星",s:5},{n:"如雷的盛怒",s:5},{n:"炽烈的炎之魔女",s:5},{n:"翠绿之影",s:5},{n:"被怜爱的少女",s:5},{n:"平息鸣雷的尊者",s:5},{n:"昔日宗室之仪",s:5},{n:"染血的骑士道",s:5},{n:"悠古的磐岩",s:5},{n:"千岩牢固",s:5},{n:"苍白之火",s:5},{n:"绝缘之旗印",s:5},{n:"追忆之注连",s:5},{n:"华馆梦醒形骸记",s:5},{n:"海染砗磲",s:5},{n:"辰砂往生录",s:5},{n:"来歆余响",s:5},{n:"深林的记忆",s:5},{n:"饰金之梦",s:5},{n:"乐园遗落之花",s:5},{n:"花海甘露之光",s:5},{n:"沙上楼阁史话",s:5},{n:"水仙之梦",s:5},{n:"黄金剧团",s:5},{n:"昔时之歌",s:5},{n:"回声之林夜话",s:5},{n:"谐律异想断章",s:5},{n:"逐影猎人",s:5},{n:"未竟的遐思",s:5},{n:"黑曜秘典",s:5},{n:"烬城勇者绘卷",s:5},{n:"长夜之誓",s:5},{n:"深廊终曲",s:5},{n:"穹境示现之夜",s:5},{n:"纺月的夜歌",s:5},{n:"晨星与月的晓歌",s:5},{n:"天之美赐",s:5},{n:"影中沉凝的幻灭",s:5},{n:"风起之日",s:5},{n:"血红之证",s:5},{n:"炉火融炼之心",s:5},
+
+{n:"行者之心",s:4},{n:"奇迹",s:4},{n:"武人",s:4},{n:"守护之心",s:4},{n:"战狂",s:4},{n:"教官",s:4},{n:"遗馈",s:4},{n:"赌徒",s:4},{n:"学士",s:4},{n:"流放者",s:4},{n:"勇士之心",s:4},{n:"祭火之人",s:4},{n:"祭水之人",s:4},{n:"祭雷之人",s:4},{n:"祭冰之人",s:4},{n:"冒险家",s:4},{n:"幸运儿",s:4},{n:"游医",s:4}
+
+];
+
+const KD="gsV71anime",KU="gsV71ui";
+
+let D=JSON.parse(localStorage.getItem(KD))||{accounts:{},currentAcc:""};
+
+let U=JSON.parse(localStorage.getItem(KU))||{};
+
+let ei=-1,cur="";
+
+function sd(){localStorage.setItem(KD,JSON.stringify(D))}
+
+function su(){localStorage.setItem(KU,JSON.stringify(U))}
+
+function esc(s){if(s==null)return"";return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+
+function v(id){return document.getElementById(id).value.trim()}
+
+function n(id,d){const x=parseInt(document.getElementById(id).value);return isNaN(x)?d:x}
+
+function toast(m){const t=document.createElement("div");t.style.cssText="position:fixed;top:30px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#ff9eb5,#c9a0dc);color:#fff;padding:12px 24px;border-radius:25px;z-index:9999;font-size:14px;box-shadow:0 6px 20px rgba(232,121,168,.4)";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
+
+const PRESETS=["linear-gradient(135deg,#ffd6e8 0%,#e8d5f5 35%,#c5e8ff 70%,#d4f5e8 100%)","linear-gradient(135deg,#ffe4b5,#ffb6c1,#dda0dd)","linear-gradient(135deg,#b0e0e6,#e6e6fa,#ffc0cb)","linear-gradient(135deg,#98fb98,#90ee90,#00ced1)","linear-gradient(135deg,#2c2c54,#40407a,#706fd3)","linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)"];
+
+function toggleBgPanel(){document.getElementById("bgPanel").classList.toggle("open")}
+
+function setPresetBg(i){document.body.style.background=PRESETS[i];document.body.style.backgroundAttachment="fixed";U.bg=PRESETS[i];delete U.bgImg;su();toast(t("msg_bg_changed"))}
+
+function resetBg(){document.body.style.background=PRESETS[0];document.body.style.backgroundAttachment="fixed";delete U.bg;delete U.bgImg;su();toast(t("msg_bg_reset"))}
+
+document.getElementById("bgFileInput2").onchange=function(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){document.body.style.background="url("+ev.target.result+") center/cover fixed";U.bgImg=ev.target.result;delete U.bg;su();toast(t("msg_bg_updated"))};r.readAsDataURL(f)};
+
+document.addEventListener("click",function(e){if(!e.target.closest(".bg-settings-btn")&&!e.target.closest(".bg-panel"))document.getElementById("bgPanel").classList.remove("open")});
+
+function renderChar(dd,ii){let h='<div class="dd-group">'+t("g5_char")+'</div>';C.filter(c=>c.s==5).forEach(c=>{h+='<div class="dd-item" onclick="selChar(\''+ii+'\',\''+c.n+'\',\''+dd+'\','+c.s+',\''+c.e+'\')"><span class="star5">'+c.n+'</span> 5★ '+E[c.e]+'</div>'});h+='<div class="dd-group">'+t("g4_char")+'</div>';C.filter(c=>c.s==4).forEach(c=>{h+='<div class="dd-item" onclick="selChar(\''+ii+'\',\''+c.n+'\',\''+dd+'\','+c.s+',\''+c.e+'\')"><span class="star4">'+c.n+'</span> 4★ '+E[c.e]+'</div>'});document.getElementById(dd).innerHTML=h}
+
+function renderWeapon(dd,ii,wt){const el=document.getElementById(dd);if(!wt){el.innerHTML='<div class="dd-group">'+t("sel_wp")+'</div>';return}const list=W[wt]||[];let h='<div class="dd-group">'+wt+t("g5_wp")+'</div>';list.filter(w=>w.s==5).forEach(w=>{h+='<div class="dd-item" onclick="selW(\''+ii+'\',\''+w.n+'\',\''+dd+'\')"><span class="star5">'+w.n+'</span> 5★</div>'});h+='<div class="dd-group">'+wt+t("g4_wp")+'</div>';list.filter(w=>w.s==4).forEach(w=>{h+='<div class="dd-item" onclick="selW(\''+ii+'\',\''+w.n+'\',\''+dd+'\')"><span class="star4">'+w.n+'</span> 4★</div>'});h+='<div class="dd-group">'+wt+t("g3_wp")+'</div>';list.filter(w=>w.s==3).forEach(w=>{h+='<div class="dd-item" onclick="selW(\''+ii+'\',\''+w.n+'\',\''+dd+'\')"><span class="star3">'+w.n+'</span> 3★</div>'});el.innerHTML=h}
+
+function renderArt(dd,ii){let h='<div class="dd-group">'+t("g5_art")+'</div>';A.filter(a=>a.s==5).forEach(a=>{h+='<div class="dd-item" onclick="selA(\''+ii+'\',\''+a.n+'\',\''+dd+'\')"><span class="star5">'+a.n+'</span></div>'});h+='<div class="dd-group">'+t("g4_art")+'</div>';A.filter(a=>a.s==4).forEach(a=>{h+='<div class="dd-item" onclick="selA(\''+ii+'\',\''+a.n+'\',\''+dd+'\')"><span class="star4">'+a.n+'</span></div>'});document.getElementById(dd).innerHTML=h}
+
+function openDD(dd){document.querySelectorAll(".dropdown").forEach(d=>d.classList.remove("open"));if(dd==="charDD")renderChar("charDD","rName");else if(dd==="edit_charDD")renderChar("edit_charDD","edit_rName");else if(dd==="weaponDD")renderWeapon("weaponDD","wName",document.getElementById("wType").value);else if(dd==="edit_weaponDD")renderWeapon("edit_weaponDD","edit_wName",document.getElementById("edit_wType").value);else if(dd==="artDD")renderArt("artDD","artSet");else if(dd==="edit_artDD")renderArt("edit_artDD","edit_artSet");document.getElementById(dd).classList.add("open")}
+
+function filterDD(dd,kw){kw=kw.trim().toLowerCase();const el=document.getElementById(dd);el.querySelectorAll(".dd-item").forEach(it=>{it.style.display=(!kw||it.textContent.toLowerCase().includes(kw))?"":"none"});el.querySelectorAll(".dd-group").forEach(g=>{let nx=g.nextElementSibling,hv=false;while(nx&&!nx.classList.contains("dd-group")){if(nx.style.display!=="none"){hv=true;break}nx=nx.nextElementSibling}g.style.display=hv?"":"none"})}
+
+function selChar(ii,nm,dd,s,e){document.getElementById(ii).value=nm;const p=ii.startsWith("edit_")?"edit_":"";document.getElementById(p+"rStar").value=s;document.getElementById(p+"rEle").value=E[e];document.getElementById(dd).classList.remove("open")}
+
+function selW(ii,nm,dd){document.getElementById(ii).value=nm;document.getElementById(dd).classList.remove("open")}
+
+function selA(ii,nm,dd){document.getElementById(ii).value=nm;document.getElementById(dd).classList.remove("open")}
+
+function updateWeaponDD(){document.getElementById("wName").value="";if(document.getElementById("weaponDD").classList.contains("open"))renderWeapon("weaponDD","wName",document.getElementById("wType").value)}
+
+function updateEditWeaponDD(){document.getElementById("edit_wName").value="";if(document.getElementById("edit_weaponDD").classList.contains("open"))renderWeapon("edit_weaponDD","edit_wName",document.getElementById("edit_wType").value)}
+
+document.addEventListener("click",function(e){if(!e.target.closest(".search-select"))document.querySelectorAll(".dropdown").forEach(d=>d.classList.remove("open"))});
+
+function renderAcc(){const sel=document.getElementById("accSelect");sel.innerHTML="";const ks=Object.keys(D.accounts);if(!ks.length){const o=document.createElement("option");o.value="";o.textContent=t("no_acc");sel.appendChild(o);D.currentAcc="";cur="";renderList();return}ks.forEach(k=>{const o=document.createElement("option");o.value=k;o.textContent=k+"（"+D.accounts[k].length+"）";sel.appendChild(o)});if(D.currentAcc&&D.accounts[D.currentAcc])sel.value=D.currentAcc;else sel.value=ks[0];cur=sel.value;D.currentAcc=cur;renderList()}
+
+function onAccChange(){cur=document.getElementById("accSelect").value;D.currentAcc=cur;sd();renderList()}
+
+function addAccount(){const nm=v("accName");if(!nm){toast(t("msg_acc_empty"));return}if(D.accounts[nm]){toast(t("msg_acc_exist"));return}D.accounts[nm]=[];D.currentAcc=nm;sd();document.getElementById("accName").value="";renderAcc();toast(t("msg_acc_created"))}
+
+function delAccount(){if(!cur){toast(t("msg_no_acc"));return}if(!confirm(t("msg_del_acc_confirm")))return;delete D.accounts[cur];D.currentAcc="";sd();renderAcc();toast(t("msg_role_deleted"))}
+
+function saveRole(){if(!cur){toast(t("msg_please_acc"));return}const nm=v("rName");if(!nm){toast(t("msg_role_empty"));return}const r={name:nm,star:v("rStar")||"5",ele:v("rEle")||"-",cons:n("rCon",0),level:n("rLv",90),wname:v("wName"),wtype:v("wType"),wlv:n("wLv",0),refine:n("wRef",1),wnote:v("wNote"),t1:n("t1",1),t2:n("t2",1),t3:n("t3",1),artSet:v("artSet"),sAtk:v("sAtk"),sDef:v("sDef"),sEm:v("sEm"),sCr:v("sCr"),sCd:v("sCd"),sEr:v("sEr"),sDmg:v("sDmg"),sHp:v("sHp")};D.accounts[cur].push(r);sd();renderList();["rName","rStar","rEle","rCon","rLv","wName","wType","wLv","wRef","wNote","t1","t2","t3","artSet","sAtk","sDef","sEm","sCr","sCd","sEr","sDmg","sHp"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});toast(t("msg_role_saved"))}
+
+function renderList(){const wrap=document.getElementById("roleListWrap"),bar=document.getElementById("statBar"),acc=D.accounts[cur];if(!acc||!acc.length){wrap.innerHTML='<div class="empty-tip">'+t("no_role")+'</div>';bar.innerHTML="";return}let c5=0;acc.forEach(r=>{if(r.star==5)c5++});bar.innerHTML='<span class="stat-chip">'+t("total")+'：'+acc.length+'</span><span class="stat-chip">'+t("five")+'：'+c5+'</span><span class="stat-chip">'+t("four")+'：'+(acc.length-c5)+'</span>';let h="";acc.forEach((r,idx)=>{const sc=r.star==5?"#e8a832":"#9b7ec4",sl=r.star==5?"5★":"4★";h+='<div class="role-item"><div class="role-header" onclick="toggleRole('+idx+')"><span><b style="color:'+sc+'">'+esc(r.name)+'</b> '+sl+' '+esc(r.ele)+' ｜ '+r.cons+'命 ｜ Lv'+(r.level||'-')+'</span><span class="arrow">'+t("click_expand")+'</span></div><div class="role-body" id="rb_'+idx+'"><div class="role-meta">'+t("talent")+'：普攻<b>'+r.t1+'</b> / E<b>'+r.t2+'</b> / Q<b>'+r.t3+'</b></div><div class="sub-block"><div class="sub-header" onclick="toggleSub(\'wb_'+idx+'\')"><span>'+t("weapon_info")+'</span><span class="arrow">▼</span></div><div class="sub-body" id="wb_'+idx+'"><p><b>'+t("weapon")+'：</b>'+esc(r.wname||"-")+'</p><p><b>'+t("type")+'：</b>'+esc(r.wtype||"-")+'</p><p><b>'+t("level")+'：</b>Lv'+(r.wlv||"-")+' ｜ <b>'+t("refine_short")+'：</b>'+(r.refine||"-")+'</p><p><b>'+t("note")+'：</b>'+esc(r.wnote||"-")+'</p></div></div><div class="sub-block"><div class="sub-header" onclick="toggleSub(\'ab_'+idx+'\')"><span>'+t("art_info")+'</span><span class="arrow">▼</span></div><div class="sub-body" id="ab_'+idx+'"><p><b>'+t("set")+'：</b>'+esc(r.artSet||"-")+'</p><div class="stat-grid"><p><b>'+t("atk")+'：</b>'+esc(r.sAtk||"-")+'</p><p><b>'+t("def")+'：</b>'+esc(r.sDef||"-")+'</p><p><b>'+t("hp")+'：</b>'+esc(r.sHp||"-")+'</p><p><b>'+t("em")+'：</b>'+esc(r.sEm||"-")+'</p><p><b>'+t("cr")+'：</b>'+esc(r.sCr||"-")+'%</p><p><b>'+t("cd")+'：</b>'+esc(r.sCd||"-")+'%</p><p><b>'+t("er")+'：</b>'+esc(r.sEr||"-")+'%</p><p><b>'+t("dmg")+'：</b>'+esc(r.sDmg||"-")+'%</p></div></div></div><div class="role-actions"><button class="green" onclick="openEdit('+idx+')">'+t("edit")+'</button><button class="red" onclick="delRole('+idx+')">'+t("delete")+'</button></div></div></div>'});wrap.innerHTML=h}
+
+function toggleRole(i){document.getElementById("rb_"+i).classList.toggle("open")}
+
+function toggleSub(id){document.getElementById(id).classList.toggle("open")}
+
+function toggleAllRole(){const acc=D.accounts[cur];if(!acc)return;const ao=acc.every((r,i)=>document.getElementById("rb_"+i).classList.contains("open"));acc.forEach((r,i)=>{const b=document.getElementById("rb_"+i);if(ao)b.classList.remove("open");else b.classList.add("open")})}
+
+function delRole(i){const acc=D.accounts[cur];if(!confirm(t("msg_del_role_confirm")))return;acc.splice(i,1);sd();renderList();toast(t("msg_role_deleted"))}
+
+function openEdit(i){ei=i;const r=D.accounts[cur][i];document.getElementById("edit_rName").value=r.name;document.getElementById("edit_rStar").value=r.star||"5";document.getElementById("edit_rEle").value=r.ele||"火";document.getElementById("edit_rCon").value=r.cons;document.getElementById("edit_rLv").value=r.level;document.getElementById("edit_wName").value=r.wname||"";document.getElementById("edit_wType").value=r.wtype||"";document.getElementById("edit_wLv").value=r.wlv;document.getElementById("edit_wRef").value=r.refine;document.getElementById("edit_wNote").value=r.wnote||"";document.getElementById("edit_t1").value=r.t1;document.getElementById("edit_t2").value=r.t2;document.getElementById("edit_t3").value=r.t3;document.getElementById("edit_artSet").value=r.artSet||"";document.getElementById("edit_sAtk").value=r.sAtk||"";document.getElementById("edit_sDef").value=r.sDef||"";document.getElementById("edit_sEm").value=r.sEm||"";document.getElementById("edit_sCr").value=r.sCr||"";document.getElementById("edit_sCd").value=r.sCd||"";document.getElementById("edit_sEr").value=r.sEr||"";document.getElementById("edit_sDmg").value=r.sDmg||"";document.getElementById("edit_sHp").value=r.sHp||"";document.getElementById("editModal").style.display="flex"}
+
+function closeModal(){document.getElementById("editModal").style.display="none";ei=-1}
+
+function submitEdit(){if(ei<0)return;const r=D.accounts[cur][ei];r.name=v("edit_rName")||r.name;r.star=v("edit_rStar")||"5";r.ele=v("edit_rEle")||"-";r.cons=n("edit_rCon",0);r.level=n("edit_rLv",90);r.wname=v("edit_wName");r.wtype=v("edit_wType");r.wlv=n("edit_wLv",0);r.refine=n("edit_wRef",1);r.wnote=v("edit_wNote");r.t1=n("edit_t1",1);r.t2=n("edit_t2",1);r.t3=n("edit_t3",1);r.artSet=v("edit_artSet");r.sAtk=v("edit_sAtk");r.sDef=v("edit_sDef");r.sEm=v("edit_sEm");r.sCr=v("edit_sCr");r.sCd=v("edit_sCd");r.sEr=v("edit_sEr");r.sDmg=v("edit_sDmg");r.sHp=v("edit_sHp");sd();renderList();closeModal();toast(t("msg_edit_saved"))}
+
+document.getElementById("editModal").addEventListener("click",function(e){if(e.target===this)closeModal()});
+
+document.getElementById("fileInput").onchange=function(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){if(!cur){toast(t("msg_please_acc"));return}const lines=ev.target.result.split(/\r?\n/);let cnt=0;for(let i=1;i<lines.length;i++){const ln=lines[i].trim();if(!ln)continue;const a=ln.split(",");if(a.length<2)continue;const r={name:(a[1]||"").trim(),star:(a[2]||"5").trim(),ele:(a[3]||"-").trim(),cons:parseInt(a[4])||0,level:parseInt(a[5])||90,wname:(a[6]||"").trim(),wtype:(a[7]||"").trim(),wlv:parseInt(a[8])||0,refine:parseInt(a[9])||1,wnote:(a[10]||"").trim(),t1:parseInt(a[11])||1,t2:parseInt(a[12])||1,t3:parseInt(a[13])||1,artSet:(a[14]||"").trim(),sAtk:(a[15]||"").trim(),sDef:(a[16]||"").trim(),sEm:(a[17]||"").trim(),sCr:(a[18]||"").trim(),sCd:(a[19]||"").trim(),sEr:(a[20]||"").trim(),sDmg:(a[21]||"").trim(),sHp:(a[22]||"").trim()};if(r.name){D.accounts[cur].push(r);cnt++}}sd();renderList();e.target.value="";toast(t("msg_import_done")+" "+cnt)};r.readAsText(f,"utf-8")};
+
+function exportCsv(){let csv="账号,角色名,星级,元素,命座,角色Lv,武器名,武器类型,武器Lv,精炼,武器备注,普攻,E,Q,圣遗物套装,攻击力,防御力,元素精通,暴击率,暴击伤害,元素充能,元素伤害加成,生命值\n";Object.keys(D.accounts).forEach(acc=>{D.accounts[acc].forEach(r=>{csv+=[acc,r.name,r.star,r.ele,r.cons,r.level,r.wname,r.wtype,r.wlv,r.refine,r.wnote,r.t1,r.t2,r.t3,r.artSet,r.sAtk,r.sDef,r.sEm,r.sCr,r.sCd,r.sEr,r.sDmg,r.sHp].join(",")+"\n"})});const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="genshin_characters.csv";a.click();URL.revokeObjectURL(url);toast(t("msg_csv_exported"))}
+
+if(U.bgImg)document.body.style.background="url("+U.bgImg+") center/cover fixed";
+
+else if(U.bg)document.body.style.background=U.bg;
+
+applyLang();
+
+renderAcc();
+
+// ===== Enka UID 一键拉取角色（追加到当前账号）=====
+const AVATAR_ID_MAP={10000002:"神里绫华",10000003:"琴",10000006:"丽莎",10000014:"芭芭拉",10000015:"凯亚",10000016:"迪卢克",10000020:"雷泽",10000021:"安柏",10000022:"温迪",10000023:"香菱",10000024:"北斗",10000025:"行秋",10000026:"魈",10000027:"凝光",10000029:"可莉",10000030:"钟离",10000031:"菲谢尔",10000032:"班尼特",10000033:"达达利亚",10000034:"诺艾尔",10000035:"七七",10000036:"重云",10000037:"甘雨",10000038:"阿贝多",10000039:"迪奥娜",10000041:"莫娜",10000042:"刻晴",10000043:"砂糖",10000044:"辛焱",10000045:"罗莎莉亚",10000046:"胡桃",10000047:"枫原万叶",10000048:"烟绯",10000049:"宵宫",10000050:"托马",10000051:"优菈",10000052:"雷电将军",10000053:"早柚",10000054:"珊瑚宫心海",10000055:"五郎",10000056:"九条裟罗",10000057:"荒泷一斗",10000058:"八重神子",10000059:"鹿野院平藏",10000060:"夜兰",10000061:"绮良良",10000063:"申鹤",10000064:"云堇",10000065:"久岐忍",10000066:"神里绫人",10000067:"柯莱",10000068:"多莉",10000069:"提纳里",10000070:"妮露",10000071:"赛诺",10000072:"坎蒂丝",10000073:"纳西妲",10000074:"莱依拉",10000075:"流浪者",10000076:"珐露珊",10000077:"瑶瑶",10000078:"艾尔海森",10000079:"迪希雅",10000080:"米卡",10000081:"卡维",10000082:"白术",10000083:"琳妮特",10000084:"林尼",10000085:"菲米尼",10000086:"莱欧斯利",10000087:"那维莱特",10000088:"夏洛蒂",10000089:"芙宁娜",10000090:"夏沃蕾",10000091:"娜维娅",10000092:"嘉明",10000093:"闲云",10000094:"千织",10000095:"希格雯",10000096:"阿蕾奇诺",10000097:"赛索斯",10000098:"克洛琳德",10000099:"艾梅莉埃",10000100:"卡齐娜",10000101:"基尼奇",10000102:"玛拉妮",10000103:"希诺宁",10000104:"恰斯卡",10000105:"欧洛伦",10000106:"玛薇卡",10000107:"茜特菈莉",10000108:"蓝砚",10000109:"梦见月瑞希",10000110:"伊安珊",10000111:"瓦雷莎",10000112:"爱可菲",10000114:"丝柯克",10000116:"伊涅芙",10000119:"菈乌玛",10000120:"菲林斯",10000121:"爱诺",10000122:"奈芙尔",10000123:"杜林",10000124:"雅珂达",10000125:"哥伦比娅",10000126:"兹白",10000127:"叶洛亚",10000128:"法尔伽",10000129:"洛恩",10000130:"莉奈娅",10000131:"尼可",10000132:"布伦妮",10000133:"桑多涅",10000140:"沃雅妮莎",10000143:"薇斯纳",10000148:"阿罗夏",10000150:"奥黛塔"};
+const ENKA_WTYPE={"WEAPON_SWORD_ONE_HAND":"单手剑","WEAPON_CLAYMORE":"双手剑","WEAPON_POLE":"长柄武器","WEAPON_CATALYST":"法器","WEAPON_BOW":"弓"};
+const ELEM_DMG={"火":"2044","雷":"2045","水":"2046","草":"2047","风":"2048","岩":"2049","冰":"2050"};
+async function fetchEnka(){
+  if(!cur){toast(t("msg_please_acc"));return}
+  const uid=document.getElementById("enkaUid").value.trim();
+  if(!/^\d{9}$/.test(uid)){toast("请输入9位数字UID");return}
+  const btn=document.getElementById("enkaBtn");btn.disabled=true;btn.textContent="拉取中...";
+  try{
+    const res=await fetch("https://enka.network/api/uid/"+uid);
+    if(!res.ok)throw new Error("HTTP "+res.status);
+    const data=await res.json();
+    if(!data.avatarInfoList||!data.avatarInfoList.length){toast("未读到角色，请确认游戏内已放入角色展示柜");return}
+    let cnt=0;
+    data.avatarInfoList.forEach(av=>{
+      const name=AVATAR_ID_MAP[av.avatarId]||("未知角色("+av.avatarId+")");
+      const ci=C.find(c=>c.n===name);
+      const star=ci?String(ci.s):"5";
+      const ele=ci?E[ci.e]:"-";
+      const cons=(av.talentIdList||[]).length;
+      const level=parseInt(av.propMap&&av.propMap["1002"]&&av.propMap["1002"].val)||1;
+      const wq=(av.equipList||[]).find(e=>e.flat&&e.flat.itemType==="ITEM_WEAPON");
+      const wlv=wq&&wq.weapon?wq.weapon.level:1;
+      const refine=wq&&wq.weapon&&wq.weapon.affixMap?Object.values(wq.weapon.affixMap)[0]:1;
+      const wtype=wq&&wq.flat?ENKA_WTYPE[wq.flat.weaponType]||"":"";
+      const sk=Object.entries(av.skillLevelMap||{}).sort((a,b)=>parseInt(a[0])-parseInt(b[0]));
+      const t1=sk[0]?sk[0][1]:1,t2=sk[1]?sk[1][1]:1,t3=sk[2]?sk[2][1]:1;
+      const fp=av.fightPropMap||{};
+      const sAtk=fp["3001"]?Math.round(fp["3001"]):"";
+      const sDef=fp["3002"]?Math.round(fp["3002"]):"";
+      const sHp=fp["3000"]?Math.round(fp["3000"]):"";
+      const sEm=fp["2020"]?Math.round(fp["2020"]):"";
+      const sCr=fp["2040"]>0?(fp["2040"]*100).toFixed(1):"";
+      const sCd=fp["2041"]>0?(fp["2041"]*100).toFixed(1):"";
+      const sEr=fp["2030"]>0?(fp["2030"]*100).toFixed(1):"";
+      const dk=ELEM_DMG[ele];
+      const sDmg=dk&&fp[dk]>0?(fp[dk]*100).toFixed(1):"";
+      D.accounts[cur].push({name,star,ele,cons,level,wname:"",wtype,wlv,refine,wnote:"",t1,t2,t3,artSet:"",sAtk,sDef,sEm,sCr,sCd,sEr,sDmg,sHp});
+      cnt++;
+    });
+    sd();renderList();
+    toast("成功拉取 "+cnt+" 个角色 ✿");
+  }catch(err){
+    console.error(err);
+    toast("拉取失败："+(err.message||"网络错误")+"，请稍后重试");
+  }finally{
+    btn.disabled=false;btn.textContent="从Enka拉取角色 ✿";
+  }
+}
+
+</script>
+
+</body>
+
+</html>
